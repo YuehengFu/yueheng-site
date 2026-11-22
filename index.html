@@ -1,9 +1,35 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Yueheng Fu</title>
+    <meta name="description" content="Yueheng Fu, first-year Systems Design Engineering student at the University of Waterloo." />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0b0c0e" />
+    <meta property="og:title" content="Yueheng Fu" />
+    <meta property="og:description" content="First-year Systems Design Engineering student at the University of Waterloo." />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <script>
+      // Set the theme before first paint so nothing flashes. A saved choice
+      // wins; otherwise follow the system, defaulting to dark.
+      ;(function () {
+        var t = null
+        try {
+          t = localStorage.getItem('theme')
+        } catch (e) {
+          /* storage blocked */
+        }
+        if (t !== 'light' && t !== 'dark') {
+          t = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+        }
+        document.documentElement.dataset.theme = t
+        var m = document.querySelector('meta[name="theme-color"]')
+        if (m) m.setAttribute('content', t === 'light' ? '#eceef1' : '#0b0c0e')
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

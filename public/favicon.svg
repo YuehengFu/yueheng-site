@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .a { fill: #1a1d22 } .b { fill: #2b3038 } .c { fill: #9fc7d6 } .d { fill: #e6c48f }
+    @media (prefers-color-scheme: light) { .a { fill: #dfe3e8 } .b { fill: #c9ced6 } }
+  </style>
+  <path class="a" d="M5 29 7 4l8 7h2l8-7 2 25z" />
+  <path class="b" d="M7 4l8 7-6 7zM25 4l-8 7 6 7z" />
+  <path class="c" d="M9 18l6-7h2l-8 18z" />
+  <path class="d" d="M23 18l-6-7-8 18h16z" opacity=".55" />
+</svg>
