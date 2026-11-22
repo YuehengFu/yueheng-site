@@ -1,0 +1,576 @@
+/* One column of quiet text, one lit object. The glaze on the cat is the only
+   colour on the page; the text borrows it for marks and hovers. */
+
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0d0d0e;
+  --ink: #ecebe8;
+  --ink-2: #a9a7a2; /* secondary text, 8.3:1 on --bg */
+  --ink-3: #85837e; /* labels and meta, 5.3:1 */
+  --rule: #232325;
+  --mark: rgb(236 138 98 / 0.13);
+  --accent: #ec8a62;
+  --focus: #ec8a62;
+  --select: rgb(216 101 61 / 0.35);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f3f1ec;
+  --ink: #1b1a19;
+  --ink-2: #4f4d49; /* 8.2:1 */
+  --ink-3: #6b6863; /* 5.2:1 */
+  --rule: #dedad2;
+  --mark: rgb(210 96 58 / 0.11);
+  --accent: #b44a26;
+  --focus: #b44a26;
+  --select: rgb(210 96 58 / 0.25);
+}
+
+:root {
+  --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI Variable Text', 'Segoe UI', 'Helvetica Neue',
+    Arial, sans-serif;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --column: 34rem;
+  --gutter: 2rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 1rem/1.62 var(--sans);
+  font-feature-settings: 'kern', 'liga', 'calt';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color 240ms ease, color 240ms ease;
+}
+
+::selection {
+  background: var(--select);
+  color: var(--ink);
+}
+
+h1,
+h2,
+p,
+ul,
+dl,
+dd {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 30%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  transition: text-decoration-color 180ms ease, color 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a:hover {
+    text-decoration-color: var(--accent);
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip {
+  position: absolute;
+  left: var(--gutter);
+  top: 0.75rem;
+  z-index: 10;
+  padding: 0.4rem 0.7rem;
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: 6px;
+  transform: translateY(-200%);
+}
+
+.skip:focus-visible {
+  transform: none;
+}
+
+/* ---------- the stage behind everything ---------- */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  height: 100vh;
+  height: 100lvh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.backdrop-dim,
+.stage {
+  position: absolute;
+  inset: 0;
+}
+
+.stage {
+  opacity: 0;
+  transition: opacity 1400ms var(--ease-out);
+}
+
+.stage[data-ready] {
+  opacity: 1;
+}
+
+/* No WebGL: a still of the same render in the same spot (see scene/layout.js).
+   The image is framed 1.28 cat-heights tall, centred on the cat. */
+.still {
+  position: absolute;
+  left: calc(50% + 17rem);
+  top: 47%;
+  height: calc(min(66vh, 720px) * 1.28);
+  aspect-ratio: 900 / 1140;
+  transform: translate(-50%, -50%);
+}
+
+.still img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* the floor shadow, in the theme's strength */
+.still::before {
+  content: '';
+  position: absolute;
+  left: 27%;
+  right: 27%;
+  top: 92%;
+  height: 6%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / var(--still-shadow, 0.7)), transparent);
+}
+
+[data-theme='light'] .still {
+  --still-shadow: 0.25;
+}
+
+/* ---------- page ---------- */
+
+.page {
+  position: relative;
+  z-index: 1;
+  width: min(70rem, 100% - var(--gutter) * 2);
+  margin-inline: auto;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  padding-block: 2.25rem 0;
+  font-size: 0.9375rem;
+}
+
+.name {
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: -0.005em;
+  margin-right: auto;
+}
+
+.top nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.top nav a {
+  color: var(--ink-2);
+  text-decoration: none;
+  padding-block: 0.5rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .top nav a:hover {
+    color: var(--ink);
+  }
+}
+
+.toggle {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-right: -0.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: color 180ms ease, background-color 180ms ease, transform 160ms var(--ease-out);
+}
+
+.toggle:active {
+  transform: scale(0.94);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .toggle:hover {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--ink) 7%, transparent);
+  }
+}
+
+.toggle svg {
+  grid-area: 1 / 1;
+  width: 1.125rem;
+  height: 1.125rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: opacity 200ms ease, transform 300ms var(--ease-out);
+}
+
+[data-theme='dark'] .toggle [data-icon='sun'],
+[data-theme='light'] .toggle [data-icon='moon'] {
+  opacity: 0;
+  transform: rotate(-60deg) scale(0.7);
+}
+
+.column {
+  width: min(var(--column), 100%);
+  padding-block: clamp(5rem, 15vh, 9rem) 0;
+}
+
+section + section {
+  margin-top: 4rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+}
+
+h2 {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ink-3);
+  letter-spacing: 0.01em;
+  margin-bottom: 1.25rem;
+}
+
+.intro p {
+  font-size: 1.0625rem;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.intro p + p {
+  margin-top: 0.9rem;
+  color: var(--ink-2);
+}
+
+mark {
+  color: inherit;
+  background: var(--mark);
+  padding: 0.05em 0.25em;
+  margin-inline: -0.1em;
+  border-radius: 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* rows: experience and projects */
+
+.rows {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 1.5rem;
+  row-gap: 0.2rem;
+}
+
+.row-head {
+  grid-column: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.5rem;
+}
+
+.row-title {
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+a.row-title {
+  text-decoration-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a.row-title:hover {
+    text-decoration-color: var(--accent);
+  }
+}
+
+.arrow {
+  color: var(--ink-3);
+  font-weight: 400;
+  display: inline-block;
+  transition: transform 200ms var(--ease-out), color 200ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a.row-title:hover .arrow {
+    color: var(--accent);
+    transform: translate(1px, -1px);
+  }
+}
+
+.row-role {
+  color: var(--ink-2);
+}
+
+.row-role::before {
+  content: '· ';
+  color: var(--ink-3);
+}
+
+.row-body {
+  grid-column: 1 / -1;
+  color: var(--ink-2);
+  font-size: 0.9375rem;
+  text-wrap: pretty;
+}
+
+.row-result {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  align-self: baseline;
+  color: var(--ink-3);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.row-quiet .row-body {
+  color: var(--ink-3);
+}
+
+/* numbers */
+
+.notes {
+  display: grid;
+  gap: 0.65rem;
+  color: var(--ink-2);
+  font-size: 0.9375rem;
+}
+
+.notes li {
+  display: grid;
+  grid-template-columns: 4.25rem 1fr;
+  column-gap: 0.75rem;
+}
+
+.lead {
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* toolkit */
+
+.toolkit {
+  display: grid;
+  gap: 0.45rem;
+  font-size: 0.9375rem;
+}
+
+.toolkit div {
+  display: grid;
+  grid-template-columns: 5.75rem 1fr;
+  column-gap: 0.75rem;
+}
+
+.toolkit dt {
+  color: var(--ink-3);
+}
+
+.toolkit dd {
+  color: var(--ink-2);
+}
+
+/* contact */
+
+#contact > p {
+  color: var(--ink-2);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  margin-top: 0.9rem;
+}
+
+.links a {
+  display: inline-block;
+  padding-block: 0.35rem;
+}
+
+.email {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.copy {
+  font: inherit;
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  min-width: 4.5rem;
+  cursor: pointer;
+  transition: color 160ms ease, border-color 160ms ease, transform 160ms var(--ease-out);
+}
+
+.copy:active {
+  transform: scale(0.96);
+}
+
+.copy[data-copied] {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .copy:hover {
+    color: var(--ink);
+    border-color: var(--ink-3);
+  }
+}
+
+/* footer */
+
+.foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(var(--column), 100%);
+  margin-top: 6rem;
+  padding-block: 1.25rem 2.5rem;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+}
+
+.foot a {
+  text-decoration: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .foot a:hover {
+    color: var(--ink);
+  }
+}
+
+/* ---------- narrow: the cat floats above the intro ---------- */
+
+@media (max-width: 899px) {
+  :root {
+    --gutter: 1.25rem;
+  }
+
+  .top {
+    padding-top: 1.25rem;
+    gap: 1rem;
+  }
+
+  .top nav {
+    gap: 1rem;
+  }
+
+  .column {
+    margin-inline: auto;
+    padding-top: calc(47svh - 3.5rem);
+  }
+
+  .foot {
+    margin-inline: auto;
+  }
+
+  .still {
+    left: 50%;
+    top: 23.5%;
+    height: calc(min(30vh, 70vw) * 1.28);
+  }
+}
+
+@media (max-width: 479px) {
+  .top nav a[href='#experience'] {
+    display: none;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .row-result {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .toggle svg,
+  .arrow {
+    transition: opacity 200ms ease;
+  }
+}
